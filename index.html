@@ -628,7 +628,6 @@ function RoomView({ roomCode, me, onLeave }) {
     <div className="fade-up">
       {toast && <Toast message={toast} />}
       
-      {/* Room header */}
       <div className="flex items-center justify-between mb-6">
         <div>
           <div className="flex items-center gap-2 mb-2">
@@ -651,14 +650,12 @@ function RoomView({ roomCode, me, onLeave }) {
         </button>
       </div>
 
-      {/* Overall Podium */}
       {participants.length > 0 && (
         <div className="mb-6">
           <PodiumSection participants={participants} accuracyFn={overallAccFn} title="Season Standing" />
         </div>
       )}
 
-      {/* Participants */}
       <div className="glass p-4 mb-6">
         <p className="font-orbitron text-xs text-white/50 mb-3 tracking-widest">PILOTS</p>
         <div className="flex flex-wrap gap-2">
@@ -673,7 +670,6 @@ function RoomView({ roomCode, me, onLeave }) {
         </div>
       </div>
 
-      {/* Sub-Rooms / Races */}
       <div className="mb-4">
         <div className="flex items-center justify-between mb-3">
           <p className="font-orbitron text-xs text-white/50 tracking-widest">RACE ROOMS</p>
@@ -760,12 +756,10 @@ function LandingView({ onEnterRoom }) {
     if (fetchErr || !data) { setError('Room not found. Check the code.'); setLoading(false); return; }
 
     const roomData = deepClone(data.data);
-    let me = roomData.participants?.find(p => p.id === p.id); // FIX: Each participant gets unique ID, always treated as new
-    if (!me) {
-      me = { id: uid(), name: name.trim(), team };
-      roomData.participants = [...(roomData.participants || []), me];
-      await supabaseClient.from(TABLE).update({ data: roomData }).eq('id', code);
-    }
+    // ✅ FIX: Always create a new participant with unique ID
+    const me = { id: uid(), name: name.trim(), team };
+    roomData.participants = [...(roomData.participants || []), me];
+    await supabaseClient.from(TABLE).update({ data: roomData }).eq('id', code);
 
     saveRecentRoom(code);
     onEnterRoom(code, me);
